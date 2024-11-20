@@ -3,30 +3,27 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.8 # Example: Specify a runtime if needed
+      nodejs: 16  # Specify the runtime (e.g., Node.js, Python, etc.)
     commands:
-      - echo "Installing dependencies (if any)..."
-      # Install zip utility if not already available
-      - yum install -y zip
+      - echo "Installing dependencies..."
+      - yum install -y zip  # Install zip tool if required for packaging
 
   pre_build:
     commands:
-      - echo "Preparing files for zipping..."
-      # Create a directory if needed to organize the output
-      - mkdir -p output
+      - echo "Running pre-build steps..."
+      - echo "Validating HTML..."
+      - curl -s https://validator.w3.org/nu/ -F "out=json" -F "content=$(cat index.html)"
 
   build:
     commands:
-      - echo "Zipping files..."
-      # Replace 'source_folder' with your actual folder containing the files to zip
-      - zip -r output/deployment-package.zip source_folder
-      - echo "Zipping completed. Deployment package created at output/deployment-package.zip"
+      - echo "Building the deployment package..."
+      - zip -r my-deployment-package.zip index.html appspec.yml scripts/
 
   post_build:
     commands:
-      - echo "Build completed successfully."
+      - echo "Uploading deployment package to S3..."
+      - aws s3 cp my-deployment-package.zip s3://your-s3-bucket-name/
 
 artifacts:
   files:
-    - output/deployment-package.zip # Specify the zip file to be retained as an artifact
-  discard-paths: yes # Keeps only the zip file, not the full path structure
+    - my-deployment-package.zip
