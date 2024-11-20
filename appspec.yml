@@ -1,0 +1,11 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/html  # Destination directory for your web server (e.g., Apache/Nginx)
+
+hooks:
+  AfterInstall:
+    - location: scripts/restart-server.sh
+      timeout: 300
+      runas: root
